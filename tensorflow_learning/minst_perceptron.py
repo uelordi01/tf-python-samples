@@ -30,7 +30,7 @@ y_input = tf.placeholder(tf.float32, shape=[None, no_classes])
 
 # defining fully connected layers:
 weights = tf.Variable(tf.random_normal([input_size, no_classes]))
-variable_summaries(weights)
+# variable_summaries(weights)
 
 bias = tf.Variable(tf.random_normal([no_classes]))
 variable_summaries(bias)
@@ -45,7 +45,8 @@ softmax_cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
 labels=y_input, logits=logits)
 # we compute the loss function
 loss_operation = tf.reduce_mean(softmax_cross_entropy)
-variable_summaries(loss_operation)
+tf.summary.scalar("loss", loss_operation)
+# variable_summaries(loss_operation)
 # we apply the backpropagation through gradient descent to the loss function
 
 optimiser = tf.train.GradientDescentOptimizer(
@@ -67,12 +68,16 @@ session.run(tf.global_variables_initializer())
 counter = 0;
 for batch_no in range(total_batches):
     mnist_batch = mnist_data.train.next_batch(batch_size)
-    summary, loss_value  = session.run([optimiser, loss_operation], feed_dict={
+    loss_value  = session.run([optimiser, loss_operation], feed_dict={
     x_input: mnist_batch[0],
     y_input: mnist_batch[1]
     })
+    summary = session.run(summ, feed_dict={
+    x_input: mnist_batch[0],
+    y_input: mnist_batch[1]})
     print(loss_value)
     train_writer.add_summary(summary, counter)
+    counter = counter +1
 # for batch_no in range(total_batches)
 #     mnist_batch = mnist_data.train.next_batch(batch_size),
 #
